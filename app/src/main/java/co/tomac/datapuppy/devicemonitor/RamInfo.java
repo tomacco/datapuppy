@@ -17,6 +17,6 @@ public class RamInfo {
             return -1;
         }
         activityManager.getMemoryInfo(memoryInfo);
-        return memoryInfo.availMem / (double) memoryInfo.totalMem * 100;
+        return (1 - memoryInfo.availMem / (double) memoryInfo.totalMem) * 100;
     }
 }

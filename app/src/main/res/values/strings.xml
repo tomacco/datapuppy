@@ -6,4 +6,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="cpu_notification_description">Show an alert when the CPU Usage is greater than:</string>
+    <string name="ram_notification_description">Show an alert when the RAM usage is greater than:</string>
+    <string name="battery_notification_description">Show an alert when battery level is below:</string>
 </resources>

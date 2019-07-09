@@ -41,12 +41,12 @@
         android:id="@+id/cpuLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="96dp"
+        android:layout_marginEnd="64dp"
         android:text="40%"
         android:textColor="@color/dark_gray"
         android:textSize="@dimen/stats_text_size"
         app:layout_constraintBottom_toBottomOf="@+id/cpuImage"
-        app:layout_constraintStart_toEndOf="@+id/cpuImage"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/cpuImage" />
 
     <TextView
@@ -99,4 +99,13 @@
         app:layout_constraintEnd_toEndOf="@+id/batteryImage"
         app:layout_constraintStart_toStartOf="@+id/batteryImage"
         app:layout_constraintTop_toBottomOf="@+id/batteryImage" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="used"
+        app:layout_constraintEnd_toEndOf="@+id/ramLabel"
+        app:layout_constraintTop_toBottomOf="@+id/ramLabel" />
 </androidx.constraintlayout.widget.ConstraintLayout>
