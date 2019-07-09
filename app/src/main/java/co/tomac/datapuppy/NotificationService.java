@@ -5,9 +5,11 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 
@@ -23,19 +25,37 @@ import co.tomac.datapuppy.devicemonitor.DeviceMonitorListener;
 
 public class NotificationService extends Service implements DeviceMonitorListener {
 
-
+    private final IBinder binder = new NotificationBinder();
     public static final String METRIC_TYPE = "metric-type";
     public static final String THRESHOLD = "threshold";
+
     private Map<MetricType, Integer> thresholds = new ConcurrentHashMap<>();
 
     private boolean cpuOverThreshold = false;
+
     private boolean ramOverThreshold = false;
     private boolean batteryBelowThreshold = false;
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        startForegroundIfOreoOrGreater();
+    }
+
+    private void startForegroundIfOreoOrGreater() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return;
+        }
+        Notification notification = new NotificationCompat.Builder(this, PuppyApp.NOTIFICATION_CHANNEL_ID)
+                .setContentTitle("DataPuppy is monitoring device resources...")
+                .setSmallIcon(R.drawable.ic_home_black_24dp)
+                .build();
+        this.startForeground(100, notification);
     }
 
     static void configureChannelsIfOreoOrGreater(Context context) {
@@ -55,16 +75,27 @@ public class NotificationService extends Service implements DeviceMonitorListene
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        MetricType type = MetricType.valueOf(intent.getStringExtra(METRIC_TYPE));
-        int threshold = intent.getIntExtra(THRESHOLD, -1);
+    public ComponentName startForegroundService(Intent service) {
+        return super.startForegroundService(service);
+    }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        return START_STICKY;
+    }
+
+    public Map<MetricType, Integer> getConfiguredNotifications() {
+        return thresholds;
+    }
+
+    public void alertResourceUsage(MetricType type, int threshold) {
         if (threshold == -1) {
             thresholds.remove(type);
         } else {
             thresholds.put(type, threshold);
         }
-        return START_STICKY;
+        evaluateState();
     }
 
     private void evaluateState() {
@@ -81,7 +112,9 @@ public class NotificationService extends Service implements DeviceMonitorListene
         Notification notification = new NotificationCompat.Builder(this, PuppyApp.NOTIFICATION_CHANNEL_ID)
                 .setContentTitle("ALARM")
                 .setAutoCancel(true)
-                .setContentText(message).build();
+                .setContentText(message)
+                .setSmallIcon(R.drawable.ic_home_black_24dp)
+                .build();
         getNotificationManager(this).notify(type.ordinal(), notification);
 
     }
@@ -96,7 +129,7 @@ public class NotificationService extends Service implements DeviceMonitorListene
         //noinspection ConstantConditions
         if (cpuUsage >= alarmThreshold) {
             if (!cpuOverThreshold) {
-                this.showNotification("CPU Usage is over the selected threshold. Current load: "
+                this.showNotification("CPU Usage. Load: "
                         + cpuUsage + "%", eventType);
                 cpuOverThreshold = true; //avoid showing notifications multiple times
             }
@@ -115,7 +148,7 @@ public class NotificationService extends Service implements DeviceMonitorListene
         //noinspection ConstantConditions
         if (ramUsage >= alarmThreshold) {
             if (!ramOverThreshold) {
-                this.showNotification("RAM Usage is over the selected threshold. Current usage: "
+                this.showNotification("RAM Usage: "
                         + ramUsage + "%", eventType);
                 ramOverThreshold = true; //avoid showing notifications multiple times
             }
@@ -134,12 +167,18 @@ public class NotificationService extends Service implements DeviceMonitorListene
         //noinspection ConstantConditions
         if (batteryRemaining <= alarmThreshold) {
             if (!batteryBelowThreshold) {
-                this.showNotification("Battery level below the selected threshold. Current level: "
+                this.showNotification("Battery level. Current level: "
                         + batteryRemaining + "%", eventType);
                 batteryBelowThreshold = true; //avoid showing notifications multiple times
             }
         } else if (batteryBelowThreshold) {
             batteryBelowThreshold = false;
+        }
+    }
+
+    public class NotificationBinder extends Binder {
+        NotificationService getService() {
+            return NotificationService.this;
         }
     }
 }

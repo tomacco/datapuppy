@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
-public class MainActivity extends AppCompatActivity implements StateFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity {
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -24,19 +24,21 @@ public class MainActivity extends AppCompatActivity implements StateFragment.OnF
                         replaceFragment(R.id.container, new StateFragment(), StateFragment.FRAGMENT_TAG);
                         return true;
                     case R.id.navigation_notifications:
-                        replaceFragment(R.id.container, new StateFragment(), StateFragment.FRAGMENT_TAG);
+                        replaceFragment(R.id.container, new NotificationsFragment(), NotificationsFragment.FRAGMENT_TAG);
                         return true;
                 }
                 return false;
             };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        replaceFragment(R.id.container, new StateFragment(), StateFragment.FRAGMENT_TAG);
+
     }
 
 
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements StateFragment.OnF
     }
 
     @Override
-    public void onFragmentInteraction(String param) {
-
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        //NOP
     }
 }

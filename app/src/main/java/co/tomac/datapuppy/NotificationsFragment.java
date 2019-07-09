@@ -15,6 +15,7 @@ import butterknife.ButterKnife;
 
 public class NotificationsFragment extends Fragment {
 
+    public static final String FRAGMENT_TAG = "NOTIFICATION_FRAGMENT";
     @BindView(R.id.notificationsRecyclerView)
     RecyclerView notificationsRecyclerView;
     private LinearLayoutManager layoutManager;
@@ -48,6 +49,9 @@ public class NotificationsFragment extends Fragment {
 
         layoutManager = new LinearLayoutManager(inflater.getContext());
         notificationsRecyclerView.setLayoutManager(layoutManager);
+
+        NotificationsAdapter adapter = new NotificationsAdapter();
+        notificationsRecyclerView.setAdapter(adapter);
 
         return view;
     }
