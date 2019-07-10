@@ -1,15 +1,12 @@
 package co.tomac.datapuppy;
 
 import android.os.Bundle;
-import android.view.MenuItem;
-import android.widget.TextView;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleRegistry;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 

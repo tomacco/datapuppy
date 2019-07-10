@@ -146,4 +146,8 @@ class MonitorContext {
         }
         listeners.remove(listener);
     }
+
+    EventRepository getEventRepo() {
+        return eventRepository;
+    }
 }

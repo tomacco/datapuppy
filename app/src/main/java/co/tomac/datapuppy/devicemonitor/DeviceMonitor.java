@@ -2,6 +2,10 @@ package co.tomac.datapuppy.devicemonitor;
 
 import android.app.Application;
 
+import androidx.annotation.Nullable;
+
+import co.tomac.datapuppy.devicemonitor.db.EventRepository;
+
 public class DeviceMonitor {
 
     private static MonitorContext monitorContext;
@@ -10,7 +14,7 @@ public class DeviceMonitor {
         monitorContext = new MonitorContext(application);
     }
 
-    public boolean isRunning() {
+    public static boolean isRunning() {
         return monitorContext != null && monitorContext.isRunning();
     }
 
@@ -27,6 +31,14 @@ public class DeviceMonitor {
 
     public static void unregisterListener(DeviceMonitorListener listener) {
         monitorContext.unregisterListener(listener);
+    }
+
+    @Nullable
+    public static EventRepository getEventRepository() {
+        if(!isRunning()) {
+            return null;
+        }
+        return monitorContext.getEventRepo();
     }
 
 

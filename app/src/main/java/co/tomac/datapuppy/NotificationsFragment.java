@@ -5,20 +5,43 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import co.tomac.datapuppy.devicemonitor.DeviceMonitor;
+import co.tomac.datapuppy.devicemonitor.db.Event;
+import co.tomac.datapuppy.devicemonitor.db.EventRepository;
 
 public class NotificationsFragment extends Fragment {
 
-    public static final String FRAGMENT_TAG = "NOTIFICATION_FRAGMENT";
+    static final String FRAGMENT_TAG = "NOTIFICATION_FRAGMENT";
+
     @BindView(R.id.notificationsRecyclerView)
     RecyclerView notificationsRecyclerView;
-    private LinearLayoutManager layoutManager;
+
+    @BindView(R.id.logRecyclerView)
+    RecyclerView logRecyclerView;
+
+    @OnClick(R.id.trashBinIcon)
+    public void onClearLog(View view) {
+        EventRepository eventRepo = DeviceMonitor.getEventRepository();
+        if(eventRepo == null) {
+            Toast.makeText(getActivity(),
+                    "Unable to delete log. DB Unavailable", Toast.LENGTH_LONG).show();
+            return;
+        }
+        eventRepo.deleteEventsWithType("alarm");
+    }
 
     public NotificationsFragment() {
         // Required empty public constructor
@@ -40,24 +63,34 @@ public class NotificationsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_notifications, container, false);
         ButterKnife.bind(this, view);
-        notificationsRecyclerView.setHasFixedSize(true);
 
-        layoutManager = new LinearLayoutManager(inflater.getContext());
-        notificationsRecyclerView.setLayoutManager(layoutManager);
+        notificationsRecyclerView.setHasFixedSize(true);
+        notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(inflater.getContext()));
 
         NotificationsAdapter adapter = new NotificationsAdapter();
         notificationsRecyclerView.setAdapter(adapter);
+
+        logRecyclerView.setLayoutManager(new LinearLayoutManager(inflater.getContext()));
+
+        EventRepository eventRepo = DeviceMonitor.getEventRepository();
+        if(eventRepo != null) {
+            LiveData<List<Event>> alarmEvents = eventRepo.getEventsForType("alarm");
+
+            LogAdapter logAdapter = new LogAdapter((MainActivity) this.getActivity(), alarmEvents);
+            logRecyclerView.setAdapter(logAdapter);
+        }
 
         return view;
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
     }
 

@@ -21,7 +21,6 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,8 +31,9 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     private Context context;
     private boolean notificationServiceBound;
-    private NotificationService notificationService;
+    private AlarmNotificationService notificationService;
     private Map<MetricType, Integer> notifications;
+    private boolean isLoading = true;
 
     @NonNull
     @Override
@@ -56,7 +56,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     }
 
     private void startAndBindService() {
-        Intent intent = new Intent(context, NotificationService.class);
+        Intent intent = new Intent(context, AlarmNotificationService.class);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent);
@@ -81,12 +81,16 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     }
 
     private void setupHolder(@NonNull ViewHolder holder, MetricType type, int icon, int message) {
+        isLoading = true;
         holder.setType(type);
         Drawable cpuDrawable = ResourcesCompat.getDrawable(context.getResources(), icon, null);
         holder.notificationImage.setImageDrawable(cpuDrawable);
         holder.thresholdDescription.setText(context.getResources().getString(message));
         loadMetric(holder, type);
+        isLoading = false;
+
     }
+
 
     private void loadMetric(ViewHolder holder, MetricType type) {
         if (notifications == null) {
@@ -94,11 +98,11 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         }
         Integer metric = notifications.get(type);
         if (metric != null) {
+            holder.isEnabled = true;
             holder.toggle.setChecked(true);
             holder.seekBar.setEnabled(false);
             holder.seekBar.setProgress(metric);
         }
-
     }
 
     @Override
@@ -108,8 +112,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-        NotificationService.NotificationBinder binder =
-                (NotificationService.NotificationBinder) iBinder;
+        AlarmNotificationService.NotificationBinder binder =
+                (AlarmNotificationService.NotificationBinder) iBinder;
         notificationService = binder.getService();
         notificationServiceBound = true;
         loadConfiguredNotifications();
@@ -125,6 +129,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     class ViewHolder extends RecyclerView.ViewHolder {
         private final View view;
+        boolean isEnabled = false;
 
         @BindView(R.id.imageNotificationSettings)
         ImageView notificationImage;
@@ -144,7 +149,11 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         private MetricType type;
 
         @OnCheckedChanged(R.id.switchNotifications)
-        public void onNotificationToggle(Switch toggle) {
+        void onNotificationToggle(Switch toggle) {
+            if(isLoading) {
+                return;
+            }
+            isEnabled = !isEnabled;
             if (!notificationServiceBound) {
                 Toast.makeText(context, "Notification service not bound!!", Toast.LENGTH_LONG)
                         .show();
@@ -152,7 +161,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             }
             int threshold = seekBar.getProgress();
             seekBar.setEnabled(!seekBar.isEnabled());
-            if (!toggle.isEnabled()) {
+            if (!isEnabled) {
                 threshold = -1; //means the user has deactivated the notification
             }
             notificationService.alertResourceUsage(type, threshold);

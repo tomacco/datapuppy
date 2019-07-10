@@ -1,7 +1,10 @@
 package co.tomac.datapuppy.devicemonitor.db;
 
 
-import androidx.room.*;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
 import java.util.Date;
 
@@ -17,7 +20,7 @@ public class Event {
 
     private String type;
 
-    private Double value;
+    private String value;
 
     public void setId(int id) {
         this.id = id;
@@ -31,7 +34,7 @@ public class Event {
         this.type = type;
     }
 
-    public void setValue(Double value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
@@ -47,7 +50,7 @@ public class Event {
         return type;
     }
 
-    public Double getValue() {
+    public String getValue() {
         return value;
     }
 

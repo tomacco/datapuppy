@@ -5,7 +5,9 @@
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".StateFragment">
+    tools:context=".StateFragment"
+    android:layout_above="@+id/navigation"
+    >
 
 
     <ImageView
