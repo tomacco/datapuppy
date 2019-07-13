@@ -7,11 +7,10 @@ import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-import static junit.framework.TestCase.*;
+import static junit.framework.TestCase.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -25,11 +24,11 @@ import static org.mockito.Mockito.verify;
 public class AlarmNotificationServiceTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
     }
 
     @Test
-    public void onCpuSampling() throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException {
+    public void onCpuSampling() {
         //Test 1:
         // - alarm is being configured with 20%
         // - Previous CPU reading was NOT over threshold.
