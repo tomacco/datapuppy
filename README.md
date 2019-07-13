@@ -1,5 +1,10 @@
+![](https://github.com/tomacco/datapuppy/blob/master/dataPuppyIcon.png?raw=true)
+
+
 # datapuppy
 Simple Android application that monitors CPU, RAM and Battery at any given time.
+
+
 
 
 Known issues.
