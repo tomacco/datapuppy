@@ -112,8 +112,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-        AlarmNotificationService.NotificationBinder binder =
-                (AlarmNotificationService.NotificationBinder) iBinder;
+        AlarmNotificationService.Binder binder =
+                (AlarmNotificationService.Binder) iBinder;
         notificationService = binder.getService();
         notificationServiceBound = true;
         loadConfiguredNotifications();
@@ -164,7 +164,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             if (!isEnabled) {
                 threshold = -1; //means the user has deactivated the notification
             }
-            notificationService.alertResourceUsage(type, threshold);
+            notificationService.monitorResourceAndAlertWithThreshold(type, threshold);
         }
 
         ViewHolder(final View view) {

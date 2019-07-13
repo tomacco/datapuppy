@@ -8,14 +8,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -25,14 +24,14 @@ import co.tomac.datapuppy.devicemonitor.db.EventRepository;
 
 public class AlarmNotificationService extends Service implements DeviceMonitorListener {
 
-    private final IBinder binder = new NotificationBinder();
+    private final IBinder binder = new Binder();
 
-    private Map<MetricType, Integer> activeNotificationsConfig;
+    private Map<MetricType, Integer> activeNotificationsConfig = new HashMap<>();
 
     private boolean cpuOverThreshold = false;
-
     private boolean ramOverThreshold = false;
     private boolean batteryBelowThreshold = false;
+
     private EventRepository eventRepo;
 
     @Nullable
@@ -102,7 +101,7 @@ public class AlarmNotificationService extends Service implements DeviceMonitorLi
     }
 
 
-    public void alertResourceUsage(MetricType type, int threshold) {
+    public void monitorResourceAndAlertWithThreshold(MetricType type, int threshold) {
         if (threshold == -1) { //remove notification
             activeNotificationsConfig.remove(type);
             eventRepo.insertAlarmEvent("Removing alarm for " + type.toString());
@@ -133,7 +132,7 @@ public class AlarmNotificationService extends Service implements DeviceMonitorLi
         DeviceMonitor.registerListener(this); //listen to device monitor events otherwise
     }
 
-    private void showNotificationForMetric(String message, MetricType type) {
+    protected void showNotificationForMetric(String message, MetricType type) {
         eventRepo.insertAlarmEvent(message);
         showNotification(message, type.ordinal());
     }
@@ -214,7 +213,7 @@ public class AlarmNotificationService extends Service implements DeviceMonitorLi
         }
     }
 
-    class NotificationBinder extends Binder {
+    class Binder extends android.os.Binder {
         AlarmNotificationService getService() {
             return AlarmNotificationService.this;
         }
