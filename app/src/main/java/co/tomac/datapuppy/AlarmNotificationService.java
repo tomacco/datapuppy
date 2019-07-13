@@ -133,7 +133,7 @@ public class AlarmNotificationService extends Service implements DeviceMonitorLi
     }
 
     protected void showNotificationForMetric(String message, MetricType type) {
-        eventRepo.insertAlarmEvent(message);
+        eventRepo.insertAlarmEvent("ALARM: " + message);
         showNotification(message, type.ordinal());
     }
 

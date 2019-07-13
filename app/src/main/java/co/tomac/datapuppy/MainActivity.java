@@ -1,9 +1,11 @@
 package co.tomac.datapuppy;
 
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleRegistry;
@@ -35,7 +37,19 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         replaceFragment(R.id.container, new StateFragment(), StateFragment.FRAGMENT_TAG);
+        checkAndroidVersionAndShowWarningsIfAny();
+    }
 
+    private void checkAndroidVersionAndShowWarningsIfAny() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return;
+        }
+        AlertDialog dialog =  new AlertDialog.Builder(this)
+                .setTitle("WARNING")
+                .setMessage(getString(R.string.androidVersionCPUAlert)).setPositiveButton("OK", null)
+                .create();
+
+        dialog.show();
     }
 
 

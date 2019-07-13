@@ -6,4 +6,5 @@
     <string name="cpu_notification_description">Alert when the CPU Usage &gt; </string>
     <string name="ram_notification_description">Alert when the RAM usage &gt; </string>
     <string name="battery_notification_description">Show an alert when battery level is  &lt;</string>
+    <string name="androidVersionCPUAlert">Reading CPU Load in Android 8.0 or greater has been restricted by Google with some undocumented changes. Specifically, the "proc" file cannot be read, preventing the app from getting data of the CPU Load.</string>
 </resources>
